@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.web.server.ResponseStatusException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -124,5 +126,46 @@ public class GlobalExceptionHandler {
                 "Invalid value for parameter: " + ex.getName(),
                 request
         );
+    }
+    @ExceptionHandler(OptimizationException.class)
+    public ResponseEntity<ApiErrorResponse> handleOptimizationException(
+            OptimizationException exception,
+            HttpServletRequest request
+    ) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Optimization Failed",
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(response);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiErrorResponse> handleResponseStatusException(
+            ResponseStatusException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.valueOf(
+                exception.getStatusCode().value()
+        );
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getReason() != null
+                        ? exception.getReason()
+                        : "Request could not be processed.",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(status)
+                .body(response);
     }
 }

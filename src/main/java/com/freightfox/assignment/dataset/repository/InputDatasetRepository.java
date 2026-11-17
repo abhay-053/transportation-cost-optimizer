@@ -1,6 +1,7 @@
 package com.freightfox.assignment.dataset.repository;
 
 import com.freightfox.assignment.dataset.entity.InputDataset;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,6 @@ public interface InputDatasetRepository
     List<InputDataset> findAllByAdminIdOrderByCreatedAtDesc(Long adminId);
 
     Optional<InputDataset> findByIdAndAdminId(Long id, Long adminId);
+
+    Optional<InputDataset> findFirstByAdminIdOrderByCreatedAtDesc(Long adminId);
 }
